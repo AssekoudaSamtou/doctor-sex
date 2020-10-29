@@ -19,6 +19,7 @@ catch (e) {
 const PORT = process.env.PORT || 5000;
 
 const jsonParser = bodyParser.json();
+const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 
 mongoose.connect('mongodb+srv://admin:admin@cluster0.eal7i.mongodb.net/doctor_sex?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
@@ -32,7 +33,7 @@ express()
 	
 	.get('/', (req, res) => res.render('pages/index'))
 
-	.post('/wa', jsonParser, (req, res) => {
+	.post('/wa', urlencodedParser, (req, res) => {
 		console.log(req.body);
 
 		const message = "cc";
