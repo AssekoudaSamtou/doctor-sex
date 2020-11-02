@@ -2,12 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const mongoose = require('mongoose');
-const Thing = require('./models/thing');
+const Client = require('./models/client');
+const Question = require('./models/question');
+const Proposition = require('./models/proposition');
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 const accountSid = process.env.TWILIO_ACCOUNT_SID ;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-
-console.log(accountSid, authToken);
 
 try {
 	const client = require('twilio')(accountSid, authToken);
@@ -34,12 +34,38 @@ express()
 	.get('/', (req, res) => res.render('pages/index'))
 
 	.post('/wa', urlencodedParser, (req, res) => {
-		console.log(req.body);
+		// console.log(req.body);
 
-		const message = "cc";
+		const question = new Question({
+			content: "Type de produit ?",
+			tag: "2",
+			question: { _id: "5fa01aca3cb269401c0d22f9" }
+		});
+
+
+		question.save()
+			.then((question) => {
+				console.log('Question enregistré !');
+				const proposition1 = new Proposition({
+					content: "Doctor Sex",
+					tag: "1",
+					question: { _id: question._id }
+				});
+				const proposition2 = new Proposition({
+					content: "Solution liquide",
+					tag: "2",
+					question: { _id: question._id }
+				});
+
+				proposition1.save();
+				proposition2.save();
+			})
+			.catch(error => console.log('Error !'));
+
 		const twiml = new MessagingResponse();
-
-		twiml.message(message);
+		const message = twiml.message();
+		message.body('Store Location: 123 Easy St.');
+		// message.media('https://images.unsplash.com/photo-1545093149-618ce3bcf49d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=668&q=80');
 
 		res.writeHead(200, { 'Content-Type': 'text/xml' });
 		res.end(twiml.toString());
@@ -56,10 +82,10 @@ express()
 
 
 // client.messages
-//   .create({
-//      mediaUrl: ['https://images.unsplash.com/photo-1545093149-618ce3bcf49d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=668&q=80'],
-//      from: 'whatsapp:+14155238886',
-//      body: `It's taco time!`,
-//      to: 'whatsapp:+15017122661'
-//    })
-//   .then(message => console.log(message.sid));
+// //   .create({
+// //      mediaUrl: ['https://images.unsplash.com/photo-1545093149-618ce3bcf49d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=668&q=80'],
+// //      from: 'whatsapp:+14155238886',
+// //      body: `It's taco time!`,
+// //      to: 'whatsapp:+15017122661'
+// //    })
+// //   .then(message => console.log(message.sid));
