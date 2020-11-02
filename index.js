@@ -36,41 +36,132 @@ express()
 	.post('/wa', urlencodedParser, (req, res) => {
 		// console.log(req.body);
 
-		const question = new Question({
-			content: "Type de produit ?",
-			tag: "2",
-			question: { _id: "5fa01aca3cb269401c0d22f9" }
-		});
 
 
-		question.save()
+
+
+		(new Question({
+			content: "Confirmer ?",
+		})).save()
 			.then((question) => {
-				console.log('Question enregistré !');
 				const proposition1 = new Proposition({
-					content: "Doctor Sex",
+					content: "Oui",
 					tag: "1",
 					question: { _id: question._id }
 				});
 				const proposition2 = new Proposition({
-					content: "Solution liquide",
+					content: "Non",
 					tag: "2",
 					question: { _id: question._id }
 				});
 
 				proposition1.save();
 				proposition2.save();
+
+				(new Question({
+					content: "Quantité ?",
+				})).save()
+					.then((question2) => {
+						const proposition1 = new Proposition({
+							entryType: "integer",
+							nextQuestion: question._id,
+							question: { _id: question2._id }
+						});
+
+						proposition1.save();
+
+						(new Question({
+							content: "Type de produit ?",
+						})).save()
+							.then((question3) => {
+								const proposition1 = new Proposition({
+									content: "Doctor Sex",
+									tag: "1",
+									nextQuestion: question2._id,
+									question: { _id: question3._id }
+								});
+								const proposition2 = new Proposition({
+									content: "Solution liquide",
+									tag: "2",
+									nextQuestion: question2._id,
+									question: { _id: question3._id }
+								});
+
+								proposition1.save();
+								proposition2.save();
+
+
+								(new Question({
+									content: "Action ?",
+								})).save()
+									.then((question4) => {
+										const proposition1 = new Proposition({
+											content: "Commander un produit",
+											tag: "1",
+											nextQuestion: question3._id,
+											question: { _id: question4._id }
+										});
+										const proposition2 = new Proposition({
+											content: "Informations sur un produit",
+											tag: "2",
+											nextQuestion: question3._id,
+											question: { _id: question4._id }
+										});
+										const proposition3 = new Proposition({
+											content: "Afficher mes commandes",
+											tag: "3",
+											question: { _id: question4._id }
+										});
+
+										proposition1.save();
+										proposition2.save();
+										proposition3.save();
+									})
+									.catch(error => console.log('Error !'));
+							})
+							.catch(error => console.log('Error !'));
+					})
+					.catch(error => console.log('Error !'));
 			})
 			.catch(error => console.log('Error !'));
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		const twiml = new MessagingResponse();
 		const message = twiml.message();
-		message.body('Store Location: 123 Easy St.');
+		message.body('Store');
 		// message.media('https://images.unsplash.com/photo-1545093149-618ce3bcf49d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=668&q=80');
+
+
 
 		res.writeHead(200, { 'Content-Type': 'text/xml' });
 		res.end(twiml.toString());
 	})
 	
+
+
 	.listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
 
